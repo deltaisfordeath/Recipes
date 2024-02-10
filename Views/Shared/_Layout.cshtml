@@ -1,0 +1,39 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - Recipes</title>
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/Recipes.styles.css" asp-append-version="true" />
+</head>
+<body>
+    <div class="container">
+        <div class="page-content">
+        <header>
+            <nav class="border-bottom box-shadow">
+                <div>
+                    <a asp-area="" asp-controller="Home" asp-action="Index">Home</a>
+                    <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+                    <a asp-area="" asp-controller="@Recipes.Controllers.RecipesController.Name" asp-action="Index">Recipes</a>
+                </div>
+            </nav>
+        </header>
+        <div>
+            <main role="main">
+                @RenderBody()
+            </main>
+        </div>
+
+        </div>
+
+        <footer class="border-top footer">
+            <div>
+                &copy; 2024 - Recipes - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+            </div>
+        </footer>
+    </div>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

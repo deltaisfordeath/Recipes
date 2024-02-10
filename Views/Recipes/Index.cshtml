@@ -1,0 +1,20 @@
+@{
+    ViewData["Title"] = "Recipe List";
+}
+
+<div>
+    <h1>Recipes</h1>
+    <div class="recipe-list">
+        @foreach (var recipe in Model.Recipes)
+        {
+            <a class="recipe-link" asp-controller="@Recipes.Controllers.RecipesController.Name"
+                asp-action="@nameof(Recipes.Controllers.RecipesController.Details)"
+                asp-route-Id="@recipe.Id">@recipe.Name</a>
+        }
+    </div>
+
+    <p>
+        <a asp-controller="@Recipes.Controllers.RecipesController.Name"
+            asp-action="@nameof(Recipes.Controllers.RecipesController.AddRecipe)">Add a new recipe</a>
+    </p>
+</div>

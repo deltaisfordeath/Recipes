@@ -1,0 +1,37 @@
+@model Recipes.Models.RecipeViewModel
+
+@{
+    ViewData["Title"] = "Create a recipe";
+}
+
+<div>
+    <h1>@Model.Name</h1>
+    <p>@Model.Description</p>
+    <div>Prep Time: @Model.PrepTime minutes.</div>
+    <div>Cook Time: @Model.CookingTime minutes.</div>
+    <div>Servings: @Model.Servings</div>
+    <div>Difficulty: @Model.Difficulty</div>
+
+    @if(Model.Ingredients?.Count() > 0)
+    {
+        <div style="margin: 10px 0;">
+            <h2>Ingredients</h2>
+            @foreach (var ingredient in @Model.Ingredients)
+            {
+                <div>@ingredient.Name - @ingredient.Description</div>
+            }
+        </div>
+    }
+    
+    @if(Model.Instructions?.Count() > 0)
+    {
+        <div>
+            <h2>Instructions</h2>
+            @foreach (var instruction in @Model.Instructions)
+            {
+                <div>Step @instruction.Step: @instruction.Description</div>
+            }
+        </div>
+    }
+
+</div>
