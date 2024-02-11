@@ -80,6 +80,19 @@ public class RecipesController : Controller
         return View(viewModel);
     }
 
+    [HttpPost]
+    public async Task<IActionResult> GetIngredientSuggestions([FromBody] string nameSubstring)
+    {
+        var ingredients = await _recipeService.GetIngredientSuggestions(nameSubstring);
+        if (ingredients != null)
+        {
+            var apiIngredients = ingredients.Select(_ => new { _.Name, _.Id });
+            return new JsonResult(JsonSerializer.Serialize(apiIngredients));
+        }
+
+        return StatusCode(404);
+    }
+
     public async Task<IActionResult> AddIngredient()
     {
         var viewModel = new IngredientViewModel();

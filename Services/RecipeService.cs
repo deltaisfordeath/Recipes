@@ -86,4 +86,9 @@ public class RecipeService(
 
         return fullRecipe;
     }
+
+    public async Task<List<Ingredient>> GetIngredientSuggestions(string nameSubstring)
+    {
+        return await _ingredientRepository.FindLikeByName(nameSubstring);
+    }
 }

@@ -1,150 +1,166 @@
+@using Recipes.Controllers;
 @model Recipes.Models.RecipeViewModel
 
 @{
-    ViewData["Title"] = "Create a recipe";
+  ViewData["Title"] = "Create a recipe";
 }
 
 <div>
-    <h1>New Recipe</h1>
+  <h1>New Recipe</h1>
 
-    <form id="recipeForm">
-          <div>
-            <label asp-for="@Model.Name">Name: </label>
-            <input type="text" asp-for="@Model.Name" />
-          </div>
-          <div>
-            <label asp-for="@Model.Description">Description: </label>
-            <textarea asp-for="@Model.Description" rows="5" cols="60"></textarea>
-          </div>
-          <div>
-            <label asp-for="@Model.PrepTime">Prep time: </label>
-            <input type="number" asp-for="@Model.PrepTime" />
-          </div>
-          <div>
-            <label asp-for="@Model.CookingTime">Cook time: </label>
-            <input type="number" asp-for="@Model.CookingTime" />
-          </div>
-          <div>
-            <label asp-for="@Model.Servings">Servings: </label>
-            <input type="number" asp-for="@Model.Servings" />
-          </div>
-          <div>
-            <label asp-for="@Model.Difficulty">Difficulty: </label>
-            <input type="number" asp-for="@Model.Difficulty" />
-          </div>
-          <div>
-            <label asp-for="@Model.ImageUrl">Image Url: </label>
-            <input value="ImplementLater" asp-for="@Model.ImageUrl" />
-          </div>
-          <div id="ingredientsList"></div>
-          <div id="instructionsList"></div>
-    </form>
-    
-    <button id="addIngredientButton">Add Ingredient</button>
-    <button id="addInstructionButton">Add Step</button>
-          <button id="submitButton" type="submit">Submit Recipe</button>
+  <form id="recipeForm">
+    <div>
+      <label asp-for="@Model.Name">Name: </label>
+      <input type="text" asp-for="@Model.Name" />
+    </div>
+    <div>
+      <label asp-for="@Model.Description">Description: </label>
+      <textarea asp-for="@Model.Description" rows="5" cols="60"></textarea>
+    </div>
+    <div>
+      <label asp-for="@Model.PrepTime">Prep time: </label>
+      <input type="number" asp-for="@Model.PrepTime" />
+    </div>
+    <div>
+      <label asp-for="@Model.CookingTime">Cook time: </label>
+      <input type="number" asp-for="@Model.CookingTime" />
+    </div>
+    <div>
+      <label asp-for="@Model.Servings">Servings: </label>
+      <input type="number" asp-for="@Model.Servings" />
+    </div>
+    <div>
+      <label asp-for="@Model.Difficulty">Difficulty: </label>
+      <input type="number" asp-for="@Model.Difficulty" />
+    </div>
+    <div>
+      <label asp-for="@Model.ImageUrl">Image Url: </label>
+      <input value="ImplementLater" asp-for="@Model.ImageUrl" />
+    </div>
+    <div id="ingredientsList"></div>
+    <div id="instructionsList"></div>
+  </form>
+
+  <button id="addIngredientButton">Add Ingredient</button>
+  <button id="addInstructionButton">Add Step</button>
+  <button id="submitButton" type="submit">Submit Recipe</button>
 </div>
 
 <script>
 
-document.querySelector("#submitButton").addEventListener("click", submitRecipe);
+  document.querySelector("#submitButton").addEventListener("click", submitRecipe);
 
-document.querySelector("#addIngredientButton").addEventListener("click", addIngredient);
-document.querySelector("#addInstructionButton").addEventListener("click", addInstruction);
+  document.querySelector("#addIngredientButton").addEventListener("click", addIngredient);
+  document.querySelector("#addInstructionButton").addEventListener("click", addInstruction);
 
-const postUrl = "@Url.Action(nameof(@Recipes.Controllers.RecipesController.AddRecipe), @Recipes.Controllers.RecipesController.Name)"
+  const postUrl = "@Url.Action(nameof(RecipesController.AddRecipe), RecipesController.Name)"
 
-async function submitRecipe() {
-  const formEl = document.querySelector("#recipeForm");
-  const formData = new FormData(formEl);
+  async function submitRecipe() {
+    const formEl = document.querySelector("#recipeForm");
+    const formData = new FormData(formEl);
 
-  //const ingredientList = JSON.stringify(getIngredientList());
+    //const ingredientList = JSON.stringify(getIngredientList());
 
-  //console.log(ingredientList);
-  
-  //formData.append("Ingredients", ingredientList);
+    //console.log(ingredientList);
 
-  try {
-    const result = await fetch(postUrl, { 
-      method: 'post',
-      body: formData
-    })
-  } catch (e) {
-    console.log(e);
+    //formData.append("Ingredients", ingredientList);
+
+    try {
+      const result = await fetch(postUrl, {
+        method: 'post',
+        body: formData
+      })
+    } catch (e) {
+      console.log(e);
+    }
   }
-}
 
-function getIngredientList() {
-  const ingredientEl = document.querySelector('#ingredientsList');
-  const ingredientList = [...ingredientEl.children]
+  function getIngredientList() {
+    const ingredientEl = document.querySelector('#ingredientsList');
+    const ingredientList = [...ingredientEl.children]
       .map(ingredient => {
-        return({
+        return ({
           Name: ingredient.querySelector(".ingredient-name").value,
           Description: ingredient.querySelector(".ingredient-description").value
         });
       });
-  return ingredientList;
-}
+    return ingredientList;
+  }
 
-function addIngredient() {
-  const ingredientsEl = document.querySelector('#ingredientsList');
-  const inputCount = ingredientsEl.children?.length ?? 0;
-  const inputGroup = document.createElement('div');
-  inputGroup.classList.add('ingredient-input-group');
+  function addIngredient() {
+    const ingredientsEl = document.querySelector('#ingredientsList');
+    const inputCount = ingredientsEl.children?.length ?? 0;
+    const inputGroup = document.createElement('div');
+    inputGroup.classList.add('ingredient-input-group');
 
-  const label = document.createElement('label');
-  label.htmlFor = `Ingredients[${inputCount}].Name`;
-  label.textContent = `Ingredient ${inputCount + 1} Name:`;
+    const label = document.createElement('label');
+    label.htmlFor = `Ingredients[${inputCount}].Name`;
+    label.textContent = `Ingredient ${inputCount + 1} Name:`;
 
-  const input = document.createElement('input');
-  input.classList.add("ingredient-name");
-  input.name = `Ingredients[${inputCount}].Name`;
+    const input = document.createElement('input');
+    input.classList.add("ingredient-name");
+    input.name = `Ingredients[${inputCount}].Name`;
+    input.addEventListener('keyup', e => {
+      if (e.target.value.length >= 2) {
+        getIngredientSuggestions(e.target.value);
+      }
+    });
 
-  const descriptionLabel = document.createElement('label');
-  label.htmlFor = `Ingredients[${inputCount}].Description`;
-  label.textContent = `Ingredient ${inputCount + 1} Description:`;
+    const descriptionLabel = document.createElement('label');
+    label.htmlFor = `Ingredients[${inputCount}].Description`;
+    label.textContent = `Ingredient ${inputCount + 1} Description:`;
 
-  const description = document.createElement('input');
-  description.classList.add("ingredient-description");
-  description.name = `Ingredients[${inputCount}].Description`;
+    const description = document.createElement('input');
+    description.classList.add("ingredient-description");
+    description.name = `Ingredients[${inputCount}].Description`;
 
-  inputGroup.appendChild(label);
-  inputGroup.appendChild(input);
-  inputGroup.appendChild(descriptionLabel);
-  inputGroup.appendChild(description);
+    inputGroup.appendChild(label);
+    inputGroup.appendChild(input);
+    inputGroup.appendChild(descriptionLabel);
+    inputGroup.appendChild(description);
 
-  ingredientsEl.appendChild(inputGroup);
-}
+    ingredientsEl.appendChild(inputGroup);
+  }
 
-function addInstruction() {
-  const instructionsEl = document.querySelector('#instructionsList');
-  const inputCount = instructionsEl.children?.length ?? 0;
-  const inputGroup = document.createElement('div');
-  inputGroup.classList.add('instruction-input-group');
+  function addInstruction() {
+    const instructionsEl = document.querySelector('#instructionsList');
+    const inputCount = instructionsEl.children?.length ?? 0;
+    const inputGroup = document.createElement('div');
+    inputGroup.classList.add('instruction-input-group');
 
-  const label = document.createElement('label');
-  label.htmlFor = `Instructions[${inputCount}].Description`;
-  label.textContent = `Step ${inputCount + 1}:`;
+    const label = document.createElement('label');
+    label.htmlFor = `Instructions[${inputCount}].Description`;
+    label.textContent = `Step ${inputCount + 1}:`;
 
-  const input = document.createElement('textarea');
-  input.classList.add("instruction-description");
-  input.name = `Instructions[${inputCount}].Description`;
-  input.rows = 3;
+    const input = document.createElement('textarea');
+    input.classList.add("instruction-description");
+    input.name = `Instructions[${inputCount}].Description`;
+    input.rows = 3;
 
-  const stepNo = document.createElement('input');
-  stepNo.value = inputCount + 1;
-  stepNo.name = `Instructions[${inputCount}].Step`;
-  stepNo.hidden = true;
+    const stepNo = document.createElement('input');
+    stepNo.value = inputCount + 1;
+    stepNo.name = `Instructions[${inputCount}].Step`;
+    stepNo.hidden = true;
 
-  inputGroup.appendChild(label);
-  inputGroup.appendChild(input);
-  inputGroup.appendChild(stepNo);
+    inputGroup.appendChild(label);
+    inputGroup.appendChild(input);
+    inputGroup.appendChild(stepNo);
 
-  instructionsEl.appendChild(inputGroup);
-}
+    instructionsEl.appendChild(inputGroup);
+  }
+
+  async function getIngredientSuggestions(nameSubstring) {
+    var response = await fetch("@Url.Action(nameof(RecipesController.GetIngredientSuggestions), RecipesController.Name)", {
+      method: 'post',
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(nameSubstring)
+    });
+
+    const ingredients = await response.json();
+
+    console.log(ingredients); // TODO: build autocomplete based on ingredient suggestion response
+  }
 
 </script>
-
-@* asp-action="@nameof(@Recipes.Controllers.RecipesController.AddRecipe)" 
-          asp-controller="@Recipes.Controllers.RecipesController.Name" 
-                    method="post"*@
