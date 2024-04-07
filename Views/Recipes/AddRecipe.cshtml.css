@@ -1,0 +1,9 @@
+.ingredient-name-container {
+    position: relative;
+}
+
+.ingredient-suggestion-list {
+    position: absolute;
+    top: 0;
+    background-color: aquamarine;
+}

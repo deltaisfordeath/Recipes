@@ -86,7 +86,7 @@ public class RecipesController : Controller
         var ingredients = await _recipeService.GetIngredientSuggestions(nameSubstring);
         if (ingredients != null)
         {
-            var apiIngredients = ingredients.Select(_ => new { _.Name, _.Id });
+            string[] apiIngredients = ingredients.Select(_ => _.Name).ToArray();
             return new JsonResult(JsonSerializer.Serialize(apiIngredients));
         }
 

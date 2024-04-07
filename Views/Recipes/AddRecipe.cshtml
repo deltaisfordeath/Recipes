@@ -48,6 +48,8 @@
 
 <script>
 
+  let ingredientSuggestions = null;
+
   document.querySelector("#submitButton").addEventListener("click", submitRecipe);
 
   document.querySelector("#addIngredientButton").addEventListener("click", addIngredient);
@@ -59,12 +61,6 @@
     const formEl = document.querySelector("#recipeForm");
     const formData = new FormData(formEl);
 
-    //const ingredientList = JSON.stringify(getIngredientList());
-
-    //console.log(ingredientList);
-
-    //formData.append("Ingredients", ingredientList);
-
     try {
       const result = await fetch(postUrl, {
         method: 'post',
@@ -75,52 +71,93 @@
     }
   }
 
-  function getIngredientList() {
+  @* function getIngredientList() {
     const ingredientEl = document.querySelector('#ingredientsList');
     const ingredientList = [...ingredientEl.children]
-      .map(ingredient => {
-        return ({
-          Name: ingredient.querySelector(".ingredient-name").value,
-          Description: ingredient.querySelector(".ingredient-description").value
-        });
-      });
-    return ingredientList;
-  }
-
-  function addIngredient() {
-    const ingredientsEl = document.querySelector('#ingredientsList');
-    const inputCount = ingredientsEl.children?.length ?? 0;
-    const inputGroup = document.createElement('div');
-    inputGroup.classList.add('ingredient-input-group');
-
-    const label = document.createElement('label');
-    label.htmlFor = `Ingredients[${inputCount}].Name`;
-    label.textContent = `Ingredient ${inputCount + 1} Name:`;
-
-    const input = document.createElement('input');
-    input.classList.add("ingredient-name");
-    input.name = `Ingredients[${inputCount}].Name`;
-    input.addEventListener('keyup', e => {
-      if (e.target.value.length >= 2) {
-        getIngredientSuggestions(e.target.value);
-      }
+    .map(ingredient => {
+    return ({
+    Name: ingredient.querySelector(".ingredient-name").value,
+    Description: ingredient.querySelector(".ingredient-description").value
     });
+    });
+    return ingredientList;
+    } *@
 
-    const descriptionLabel = document.createElement('label');
-    label.htmlFor = `Ingredients[${inputCount}].Description`;
-    label.textContent = `Ingredient ${inputCount + 1} Description:`;
+    function addIngredient() {
+      const ingredientsEl = document.querySelector('#ingredientsList');
+      const inputCount = ingredientsEl.children?.length ?? 0;
+      const inputGroup = document.createElement('div');
+      inputGroup.classList.add('ingredient-input-group');
 
-    const description = document.createElement('input');
-    description.classList.add("ingredient-description");
-    description.name = `Ingredients[${inputCount}].Description`;
+      const label = document.createElement('label');
+      label.htmlFor = `Ingredients[${inputCount}].Name`;
+      label.textContent = `Ingredient ${inputCount + 1} Name:`;
 
-    inputGroup.appendChild(label);
-    inputGroup.appendChild(input);
-    inputGroup.appendChild(descriptionLabel);
-    inputGroup.appendChild(description);
+      const inputWrapper = document.createElement('div');
+      inputWrapper.className = "ingredient-name-container";
+      inputWrapper.id = `ingredient-${inputCount + 1}`;
 
-    ingredientsEl.appendChild(inputGroup);
-  }
+      const nameInput = document.createElement('input');
+      nameInput.classList.add("ingredient-name");
+      nameInput.name = `Ingredients[${inputCount}].Name`;
+      nameInput.id = nameInput.name;
+
+      nameInput.addEventListener('keydown', (e) => {
+        if (e.key === "Tab") {
+          if (ingredientSuggestions) {
+            nameInput.value = ingredientSuggestions[0];
+          }
+        }
+      });
+
+      nameInput.addEventListener('focusout', clearIngredientSuggestions);
+
+      nameInput.addEventListener('keyup', async (e) => {
+        if (e.key === "Escape" && ingredientSuggestions) {
+          clearIngredientSuggestions();
+          return;
+        }
+        if (e.target.value.length >= 2) {
+          // TODO: need to debounce api requests
+          ingredientSuggestions = await getIngredientSuggestions(e.target.value);
+          const suggestionList = document.createElement('ul');
+          suggestionList.className = "ingredient-suggestion-list";
+
+          for (let i = 0; i < ingredientSuggestions.length; ++i) {
+            const suggestion = document.createElement('li');
+            suggestion.addEventListener('click', () => {
+              nameInput.value = suggestion.textContent;
+            })
+            suggestion.textContent = ingredientSuggestions[i];
+            suggestionList.appendChild(suggestion);
+          }
+
+          if (inputWrapper.children.length > 1) inputWrapper.removeChild(inputWrapper.lastChild);
+
+          // TODO: make autocomplete suggestions clickable/tab-able
+          inputWrapper.appendChild(suggestionList);
+        }
+
+      });
+
+      const descriptionLabel = document.createElement('label');
+      descriptionLabel.htmlFor = `Ingredients[${inputCount}].Description`;
+      descriptionLabel.textContent = `Description:`;
+
+      const description = document.createElement('input');
+      description.classList.add("ingredient-description");
+      description.name = `Ingredients[${inputCount}].Description`;
+      description.id = description.name;
+
+      inputWrapper.appendChild(nameInput);
+
+      inputGroup.appendChild(label);
+      inputGroup.appendChild(inputWrapper);
+      inputGroup.appendChild(descriptionLabel);
+      inputGroup.appendChild(description);
+
+      ingredientsEl.appendChild(inputGroup);
+    }
 
   function addInstruction() {
     const instructionsEl = document.querySelector('#instructionsList');
@@ -158,9 +195,14 @@
       body: JSON.stringify(nameSubstring)
     });
 
-    const ingredients = await response.json();
+    const ingredientString = await response.json();
 
-    console.log(ingredients); // TODO: build autocomplete based on ingredient suggestion response
+    return JSON.parse(ingredientString);
+  }
+
+  function clearIngredientSuggestions() {
+    ingredientSuggestions = null;
+    document.querySelector('.ingredient-suggestion-list').remove();
   }
 
 </script>
