@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Recipes;
 using Recipes.DAL;
+using Recipes.Models;
 using Recipes.Services;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -15,6 +16,10 @@ builder.Services.AddDbContextPool<RecipeContext>(options =>
 builder.Services.AddScoped<RecipeRepository>();
 builder.Services.AddScoped<IngredientRepository>();
 builder.Services.AddScoped<RecipeService>();
+
+builder.Services.AddAuthorization();
+builder.Services.AddIdentityApiEndpoints<RecipeUser>()
+    .AddEntityFrameworkStores<RecipeContext>();
 
 var app = builder.Build();
 
@@ -32,6 +37,8 @@ app.UseStaticFiles();
 app.UseRouting();
 
 app.UseAuthorization();
+
+app.MapIdentityApi<RecipeUser>();
 
 app.MapControllerRoute(
     name: "default",

@@ -14,7 +14,7 @@ public class RecipeService(
     private readonly IngredientRepository _ingredientRepository = ingredientRepository;
 
 
-    public async Task AddRecipe(Recipe recipe, List<Ingredient> ingredients, List<RecipeInstruction> instructions)
+    public async Task AddRecipe(Recipe recipe, List<Ingredient> ingredients, List<RecipeInstruction> instructions, string CreatedBy)
     {
         await _recipeRepository.AddRecipe(recipe);
 
@@ -34,6 +34,9 @@ public class RecipeService(
             }
             else
             {
+                ingredient.CreatedBy = CreatedBy;
+                ingredient.CreatedAt = DateTime.Now;
+                ingredient.Description = ingredient.Description ?? "A New Ingredient";
                 await _ingredientRepository.AddAsync(ingredient);
                 recipeIngredient = new RecipeIngredient
                 {

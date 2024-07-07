@@ -1,6 +1,7 @@
 using System.Diagnostics;
 using System.Linq;
 using System.Text.Json;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Recipes.Models;
 using Recipes.Services;
@@ -33,6 +34,13 @@ public class RecipesController : Controller
     }
 
     [HttpGet]
+    public async Task<IActionResult> GetRecipeList()
+    {
+        var recipes = _recipeService.GetAllRecipes();
+        return new JsonResult(recipes);
+    }
+
+    [HttpGet]
     public async Task<IActionResult> AddRecipe()
     {
         var viewModel = new RecipeViewModel();
@@ -43,6 +51,7 @@ public class RecipesController : Controller
     [HttpPost]
     public async Task<IActionResult> AddRecipe(RecipeViewModel viewModel)
     {
+        
         if (viewModel.Ingredients == null || viewModel.Ingredients.Count < 1
             || viewModel.Instructions == null || viewModel.Instructions.Count < 1)
         {
@@ -60,7 +69,7 @@ public class RecipesController : Controller
             ImageUrl = viewModel.ImageUrl
         };
 
-        await _recipeService.AddRecipe(recipe, viewModel.Ingredients, viewModel.Instructions);
+        await _recipeService.AddRecipe(recipe, viewModel.Ingredients, viewModel.Instructions, "Donkey");
 
         return RedirectToAction(nameof(Index), Name);
     }

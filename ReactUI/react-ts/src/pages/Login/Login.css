@@ -1,0 +1,14 @@
+.login-container {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.login-input-group {
+    display: flex;
+    flex-direction: column;
+}
+
+.login-button {
+    margin-top: 20px;
+}

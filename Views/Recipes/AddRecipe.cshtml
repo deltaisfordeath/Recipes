@@ -49,6 +49,7 @@
 <script>
 
   let ingredientSuggestions = null;
+  let getSuggestionsTimeout = null;
 
   document.querySelector("#submitButton").addEventListener("click", submitRecipe);
 
@@ -110,6 +111,7 @@
         }
       });
 
+      // TODO: clear getSuggestionsTimeout on focusout
       nameInput.addEventListener('focusout', clearIngredientSuggestions);
 
       nameInput.addEventListener('keyup', async (e) => {
@@ -119,7 +121,21 @@
         }
         if (e.target.value.length >= 2) {
           // TODO: need to debounce api requests
-          ingredientSuggestions = await getIngredientSuggestions(e.target.value);
+          /*
+            set timeout for api call
+            clear timeout on escape key or focusout
+            timeout callback should use latest value for input el
+            append fetched suggestions to input el
+          */
+
+          if (getSuggestionsTimeout === null) {
+            ingredientSuggestions = await getIngredientSuggestions();
+          }
+
+          if (ingredientSuggestions.length === 0) {
+            ingredientSuggestions = null;
+            return;
+          }
           const suggestionList = document.createElement('ul');
           suggestionList.className = "ingredient-suggestion-list";
 
@@ -186,7 +202,11 @@
     instructionsEl.appendChild(inputGroup);
   }
 
-  async function getIngredientSuggestions(nameSubstring) {
+  async function getIngredientSuggestions() {
+    const nameSubstring = document.activeElement.value;
+
+    if (!nameSubstring) return;
+
     var response = await fetch("@Url.Action(nameof(RecipesController.GetIngredientSuggestions), RecipesController.Name)", {
       method: 'post',
       headers: {
@@ -202,7 +222,7 @@
 
   function clearIngredientSuggestions() {
     ingredientSuggestions = null;
-    document.querySelector('.ingredient-suggestion-list').remove();
+    document.querySelector('.ingredient-suggestion-list')?.remove();
   }
 
 </script>
