@@ -1,4 +1,4 @@
-import {useState, useEffect} from 'react'
+import {useState} from 'react'
 import './App.css'
 import Login from "./pages/Login/Login.tsx";
 import AddRecipe, {iRecipe} from "./pages/AddRecipe/AddRecipe.tsx";
@@ -8,8 +8,8 @@ import {
     Route,
     RouterProvider
 } from "react-router-dom";
-import Nav from "./pages/Nav/Nav.tsx";
 import Layout from "./pages/Layout/Layout.tsx";
+import Register from "./pages/Login/Register.tsx";
 
 function Recipe({recipe}: { recipe: iRecipe }) {
     return (<div className="recipe-container">
@@ -37,16 +37,20 @@ function App() {
                 // errorElement={<ErrorPage />}
             >
                 <Route
-                    path="login"
+                    path="signin"
                     element={<Login setAuthToken={setAuthToken}/>}
                 ></Route>
                 <Route
-                    path="Recipes"
+                    path="recipes"
                     element={<Recipes/>}
                 ></Route>
                 <Route
-                    path="Recipes/Add"
+                    path="recipes/add"
                     element={<AddRecipe authToken={authToken}/>}
+                ></Route>
+                <Route
+                    path="signup"
+                    element={<Register/>}
                 ></Route>
             </Route>))
 
@@ -58,13 +62,9 @@ function App() {
         setRecipes(apiRecipes);
     }
 
-
-    useEffect(() => {
-        getRecipes();
-    }, []);
-
     function Recipes() {
-        return (<div className="app-container">
+        getRecipes();
+        return (<div>
             {recipes.length > 0 && recipes.map(recipe => <Recipe recipe={recipe} key={recipe.id}/>)}
         </div>)
     }

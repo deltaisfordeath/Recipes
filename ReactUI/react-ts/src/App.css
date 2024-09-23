@@ -1,6 +1,11 @@
 .app-container {
+  display: flex;
+  flex-direction: column;
+  width: 100vw;
   max-width: 1200px;
-  margin: 10px 30px;
+  min-height: 100vh;
+  padding: 10px 30px;
+  box-sizing: border-box;
 }
 
 .recipe-container {
@@ -8,8 +13,20 @@
   border-bottom: 2px dotted #4a4a4a;
 }
 
+.error-message {
+  color: var(--error-text-color);
+  margin: 10px 0;
+  white-space: pre;
+}
+
+.navbar {
+  display: flex;
+  gap: 20px;
+  padding: 15px 0;
+}
+
 @media (min-width: 580px) {
   .app-container {
-    margin: 10px 70px;
+    padding: 10px 70px;
   }
 }

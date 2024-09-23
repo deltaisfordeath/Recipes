@@ -7,6 +7,7 @@ export default defineConfig({
   server: {
     proxy: {
       '/login': 'http://localhost:5296',
+      '/register': 'http://localhost:5296',
       '/Api': 'http://localhost:5296',
     },
   },

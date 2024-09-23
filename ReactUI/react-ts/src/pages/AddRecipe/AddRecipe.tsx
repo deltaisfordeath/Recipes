@@ -1,4 +1,5 @@
-import {useState, useRef} from "react";
+import {useState, useRef, useEffect} from "react";
+import {useNavigate} from "react-router-dom";
 
 export interface iRecipe {
     name: string,
@@ -25,6 +26,12 @@ export default function AddRecipe({authToken}: {authToken: string}) {
     const [ingredients, setIngredients] = useState<number[]>([0]);
     const [instructions, setInstructions] = useState<number[]>([0]);
     const recipeFormRef = useRef<HTMLFormElement>(null);
+    
+    const navigate = useNavigate();
+
+    useEffect(() => {
+        if (!authToken) navigate("/login", {state: {destination: "/recipes/add"}});
+    }, []);
     
     function addIngredient() {
         setIngredients([...ingredients, ingredients.length]);
@@ -79,22 +86,22 @@ export default function AddRecipe({authToken}: {authToken: string}) {
                     <input hidden value="ImplementLater" onChange={() => {}} name="ImageUrl" id="ImageUrl"/>
                 </div>
                 <div id="ingredientsList">
-                    {ingredients.map((ingredient) => <>
+                    {ingredients.map((ingredient) => <div key={`ingredient-${ingredient}`}>
                         <label htmlFor={`Ingredients[${ingredient}].Name`}>Name: </label>
                         <input type="text" name={`Ingredients[${ingredient}].Name`}
                                id={`Ingredients[${ingredient}].Name`}/>
-                    </>)
+                    </div>)
                     }
                     <button type="button" onClick={addIngredient}>Add Ingredient</button>
                 </div>
                 <div id="instructionsList">
-                    {instructions.map((instruction) => <>
+                    {instructions.map((instruction) => <div key={`instruction-${instruction}`}>
                         <label htmlFor={`Instructions[${instruction}].Name`}>Name: </label>
                         <input type="text" name={`Instructions[${instruction}].Description`}
                                id={`Instructions[${instruction}].Name`}/>
                         <input hidden type="number" name={`Instructions[${instruction}].Step`} value={instruction} onChange={() => {}}/>
                         
-                    </>)
+                    </div>)
                     }
                     <button type="button" onClick={addInstruction}>Add Instruction</button>
                 </div>
