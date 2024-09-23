@@ -21,11 +21,6 @@ public class HomeController : Controller
         return View();
     }
 
-    public IActionResult ButtPage()
-    {
-        return Json("( )( )");
-    }
-
     public IActionResult Privacy()
     {
         return View();
