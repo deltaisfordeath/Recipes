@@ -30,7 +30,7 @@ export default function AddRecipe({authToken}: {authToken: string}) {
     const navigate = useNavigate();
 
     useEffect(() => {
-        if (!authToken) navigate("/login", {state: {destination: "/recipes/add"}});
+        if (!authToken) navigate("/signin", {state: {destination: "/recipes/add"}});
     }, []);
     
     function addIngredient() {

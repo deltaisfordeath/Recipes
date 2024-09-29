@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Recipes.Models;
 using Recipes.Services;
 
@@ -62,5 +63,13 @@ public class ApiController : Controller
         await _recipeService.AddRecipe(recipe, viewModel.Ingredients, viewModel.Instructions, recipe.CreatedBy);
 
         return RedirectToAction(nameof(Index), Name);
+    }
+
+    [HttpGet]
+    public async Task<IActionResult> CheckEmail(string email)
+    {
+        var existingUser = await _userManager.Users.FirstOrDefaultAsync(u => u.Email == email);
+
+        return existingUser != null ? new JsonResult(true) : new JsonResult(false);
     }
 }

@@ -66,7 +66,7 @@ export default function Login({setAuthToken}: { setAuthToken: React.Dispatch<Rea
         </div>
         <button className="login-button" onClick={submitLogin}>Login</button>
         <div className="login-input-group">
-            <Link to={"register"}>Register a New Account</Link>
+            <Link to={"/signup"}>Register a New Account</Link>
         </div>
     </div>)
 }

@@ -1,9 +1,28 @@
-import {useState} from "react";
+import {useEffect, useState} from "react";
+import {useDebounce} from "../../hooks/useDebounce.tsx";
 
 export default function Register() {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [error, setError] = useState("");
+    
+    const debouncedEmail = useDebounce(email, 300);
+
+    useEffect( () => {
+        async function checkEmail() {
+            const stringEmail = debouncedEmail.toString();
+            if (stringEmail && stringEmail.includes("@") && stringEmail.includes(".")) {
+                const emailResponse = await fetch(`/Api/CheckEmail?email=${encodeURIComponent(stringEmail)}`);
+                const emailExists = await emailResponse.json();
+                if (emailExists) {
+                    setError(`Account with email '${stringEmail}' already exists.`);
+                }
+            }
+            
+        }
+        checkEmail();
+        
+    }, [debouncedEmail]);
 
     async function handleSubmit() {
         if (!email || !password) {
@@ -32,7 +51,6 @@ export default function Register() {
             setError(error as unknown as string);
         }
     }
-    
     
     return(<div>
         {error && <div className={'error-message'}>{error}</div>}
