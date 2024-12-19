@@ -1,8 +1,8 @@
-import React, {useEffect, useState} from "react";
+import {useEffect, useState} from "react";
 import './Login.css'
 import {useNavigate, useLocation, Link} from "react-router-dom";
 
-export default function Login({setAuthToken}: { setAuthToken: React.Dispatch<React.SetStateAction<string>> }) {
+export default function Login() {
     const [email, setEmail] = useState<string>("");
     const [password, setPassword] = useState<string>("");
     const [emailError, setEmailError] = useState<string>("");
@@ -31,8 +31,6 @@ export default function Login({setAuthToken}: { setAuthToken: React.Dispatch<Rea
         })
 
         if (auth.status === 200) {
-            const data = await auth.json();
-            setAuthToken(data.accessToken);
             navigate(location.state?.destination ?? '/recipes');
         } else {
             setLoginError("Invalid email or password");
@@ -54,7 +52,7 @@ export default function Login({setAuthToken}: { setAuthToken: React.Dispatch<Rea
         Log in!
         {loginError && <div className="error-message">{loginError}</div>}
         <div className="login-input-group">
-            <label htmlFor="email">Email</label>
+            <label htmlFor="email">Username</label>
             <input name="email" type="email" onChange={(e) => setEmail(e.target.value)} value={email}/>
             {emailError && <div className="error-message">{emailError}</div>}
         </div>

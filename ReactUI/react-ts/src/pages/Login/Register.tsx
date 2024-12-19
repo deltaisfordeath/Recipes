@@ -1,7 +1,9 @@
 import {useEffect, useState} from "react";
 import {useDebounce} from "../../hooks/useDebounce.tsx";
+import {emailRegex} from "../../constants.js";
 
 export default function Register() {
+    const [userName, setUserName] = useState("");
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [error, setError] = useState("");
@@ -11,12 +13,14 @@ export default function Register() {
     useEffect( () => {
         async function checkEmail() {
             const stringEmail = debouncedEmail.toString();
-            if (stringEmail && stringEmail.includes("@") && stringEmail.includes(".")) {
+            if (stringEmail && emailRegex.test(stringEmail)) {
                 const emailResponse = await fetch(`/Api/CheckEmail?email=${encodeURIComponent(stringEmail)}`);
                 const emailExists = await emailResponse.json();
                 if (emailExists) {
                     setError(`Account with email '${stringEmail}' already exists.`);
                 }
+            } else {
+                setError("");
             }
             
         }
@@ -25,9 +29,14 @@ export default function Register() {
     }, [debouncedEmail]);
 
     async function handleSubmit() {
-        if (!email || !password) {
+        if (!email || !password || !userName) {
             setError('Please complete all fields.');
-            return
+            return;
+        }
+        
+        if (emailRegex.test(email)) {
+            setError('Please enter a valid email');
+            return;
         }
 
         try {
@@ -38,6 +47,7 @@ export default function Register() {
                 },
                 body: JSON.stringify({
                     email,
+                    userName,
                     password,
                 })
             });
@@ -55,13 +65,18 @@ export default function Register() {
     return(<div>
         {error && <div className={'error-message'}>{error}</div>}
         <div className="login-input-group">
+            <label htmlFor="userName">Username</label>
+            <input name="userName" id="userName" type="text" placeholder="Username" onChange={(e) => setUserName(e.target.value)}/>
+        </div>
+        <div className="login-input-group">
             <label htmlFor="email">Email</label>
             <input name="email" id="email" type="email" placeholder="Email" onChange={(e) => setEmail(e.target.value)}/>
         </div>
         <div className="login-input-group">
             <label htmlFor="password">Password</label>
-            <input name="password" id="password" type="password" placeholder="Password" onChange={(e) => setPassword(e.target.value)}/>
+            <input name="password" id="password" type="password" placeholder="Password"
+                   onChange={(e) => setPassword(e.target.value)}/>
         </div>
-            <button type={'button'} onClick={handleSubmit}>Register</button>
+        <button type={'button'} onClick={handleSubmit}>Register</button>
     </div>)
 }

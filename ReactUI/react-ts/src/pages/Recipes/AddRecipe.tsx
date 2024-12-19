@@ -1,5 +1,4 @@
-import {useState, useRef, useEffect} from "react";
-import {useNavigate} from "react-router-dom";
+import {useState, useRef} from "react";
 
 export interface iRecipe {
     name: string,
@@ -12,7 +11,9 @@ export interface iRecipe {
     createdAt: iNumber,
     updatedAt: iNumber,
     imageUrl: string,
-    id: iNumber
+    id: iNumber,
+    ingredients: iIngredient[],
+    instructions: iInstruction[]
 }
 
 export interface iIngredient {
@@ -20,18 +21,17 @@ export interface iIngredient {
     description: string,
 }
 
+export interface iInstruction {
+    step: number, 
+    description: string, 
+}
+
 export type iNumber = number | null;
 
-export default function AddRecipe({authToken}: {authToken: string}) {
+export default function AddRecipe() {
     const [ingredients, setIngredients] = useState<number[]>([0]);
     const [instructions, setInstructions] = useState<number[]>([0]);
     const recipeFormRef = useRef<HTMLFormElement>(null);
-    
-    const navigate = useNavigate();
-
-    useEffect(() => {
-        if (!authToken) navigate("/signin", {state: {destination: "/recipes/add"}});
-    }, []);
     
     function addIngredient() {
         setIngredients([...ingredients, ingredients.length]);
@@ -44,11 +44,8 @@ export default function AddRecipe({authToken}: {authToken: string}) {
     async function submitRecipe() {
         if (recipeFormRef.current) {
             const formData = new FormData(recipeFormRef.current);
-            const response = await fetch("Api/AddRecipe", {
+            const response = await fetch("/Api/Recipe/Add", {
                 method: "POST",
-                headers: {
-                    "Authorization": "Bearer " + authToken,
-                },
                 body: formData,
             });
             console.log(response);
