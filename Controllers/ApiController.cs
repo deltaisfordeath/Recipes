@@ -13,17 +13,43 @@ public class ApiController : Controller
     private readonly RecipeService _recipeService;
     private readonly UserManager<RecipeUser> _userManager;
 
-    public static readonly string Name = "api";
+    private const string Name = "api";
 
     public ApiController(
         ILogger<HomeController> logger, 
         RecipeService recipeService, 
-        UserManager<RecipeUser> userManager
-    )
+        UserManager<RecipeUser> userManager)
     {
         _logger = logger;
         _recipeService = recipeService;
         _userManager = userManager;
+    }
+
+    [Route($"{Name}/Recipe/List")]
+    public async Task<IActionResult> GetRecipePage(int pageNum)
+    {
+        var recipes = await _recipeService.GetPageOfRecipes(pageNum);
+        var response = new PaginatedRecipeViewModel
+        {
+            items = recipes.Items,
+            hasNextPage = recipes.HasNextPage
+        };
+        return new JsonResult(response);
+    }
+
+    [HttpGet]
+    [Route($"{Name}/Recipe/{{recipeId:int}}")]
+    public async Task<IActionResult> GetRecipe(int recipeId)
+    {
+        var recipe = await _recipeService.GetFullRecipe(recipeId);
+        if (recipe == null)
+        {
+            return StatusCode(404);
+        }
+
+        var recipeResult = new RecipeViewModel(recipe);
+
+        return new JsonResult(recipeResult);
     }
     
     [HttpGet]
@@ -34,6 +60,7 @@ public class ApiController : Controller
     }
     
     [HttpPost, Authorize]
+    [Route($"{Name}/Recipe/Add")]
     public async Task<IActionResult> AddRecipe(RecipeViewModel viewModel)
     {
         var userId = _userManager.GetUserId(this.User);

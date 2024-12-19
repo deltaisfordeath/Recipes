@@ -16,9 +16,11 @@ public class RecipeViewModel
         ImageUrl = recipe.ImageUrl;
         Ingredients = recipe.Ingredients;
         Instructions = recipe.Instructions;
+        CreatedBy = recipe.CreatedBy;
     }
     public string? Name { get; set; }
     public string? Description { get; set; }
+    public string? CreatedBy { get; set; }
     public int? CookingTime { get; set; }
     public int? PrepTime { get; set; }
     public int? Servings { get; set; }

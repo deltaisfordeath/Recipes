@@ -1,9 +1,9 @@
-using Recipes.Models;
 using Microsoft.EntityFrameworkCore;
 using Recipes.DAL;
+using Recipes.Helpers;
+using Recipes.Models;
 
-
-namespace Recipes;
+namespace Recipes.Repos;
 
 public class RecipeRepository(RecipeContext context) : NamedEntityRepository<RecipeContext, Recipe>(context)
 {
@@ -38,8 +38,14 @@ public class RecipeRepository(RecipeContext context) : NamedEntityRepository<Rec
     public async Task<List<RecipeInstruction>> GetRecipeInstructions(int recipeId)
     {
         var instructions = await _recipeContext.RecipeInstructions
-            .Where(_ => _.Recipe.Id == recipeId).ToListAsync();
+            .Where(_ => _.Recipe.Id == recipeId)
+            .Select(_ => new RecipeInstruction {Step = _.Step, Description = _.Description}).ToListAsync();
         return instructions;
+    }
+
+    public async Task<PaginatedList<Recipe>> GetPageOfRecipes(int pageNum)
+    {
+        return await PaginatedList<Recipe>.CreateAsync(_recipeContext.Recipes, pageNum);
     }
 
     public List<Recipe> GetAllRecipes()

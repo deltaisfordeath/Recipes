@@ -1,26 +1,27 @@
 
 
 
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
+using Recipes.Helpers;
 using Recipes.Models;
+using Recipes.Repos;
 
 namespace Recipes.Services;
 
 public class RecipeService(
     RecipeRepository recipeRepository,
-    IngredientRepository ingredientRepository
+    IngredientRepository ingredientRepository,
+    UserManager<RecipeUser> userManager
     )
 {
-    private readonly RecipeRepository _recipeRepository = recipeRepository;
-    private readonly IngredientRepository _ingredientRepository = ingredientRepository;
-
-
     public async Task AddRecipe(Recipe recipe, List<Ingredient> ingredients, List<RecipeInstruction> instructions, string CreatedBy)
     {
-        await _recipeRepository.AddRecipe(recipe);
+        await recipeRepository.AddRecipe(recipe);
 
         foreach (var ingredient in ingredients)
         {
-            var existing = await _ingredientRepository.FindByName(ingredient.Name);
+            var existing = await ingredientRepository.FindByName(ingredient.Name);
 
             RecipeIngredient recipeIngredient;
 
@@ -37,7 +38,7 @@ public class RecipeService(
                 ingredient.CreatedBy = CreatedBy;
                 ingredient.CreatedAt = DateTime.Now;
                 ingredient.Description = ingredient.Description ?? "A New Ingredient";
-                await _ingredientRepository.AddAsync(ingredient);
+                await ingredientRepository.AddAsync(ingredient);
                 recipeIngredient = new RecipeIngredient
                 {
                     Recipe = recipe,
@@ -45,28 +46,34 @@ public class RecipeService(
                 };
             }
 
-            await _recipeRepository.AddRecipeIngredient(recipeIngredient);
+            await recipeRepository.AddRecipeIngredient(recipeIngredient);
         }
 
         for (var i = 0; i < instructions.Count; i++)
         {
             instructions[i].Recipe = recipe;
-            await _recipeRepository.AddRecipeInstruction(instructions[i]);
+            await recipeRepository.AddRecipeInstruction(instructions[i]);
         }
 
-        await _recipeRepository.SaveChangesAsync();
+        await recipeRepository.SaveChangesAsync();
+    }
+
+    public async Task<PaginatedList<Recipe>> GetPageOfRecipes(int pageNum)
+    {
+        var recipes = await recipeRepository.GetPageOfRecipes(pageNum);
+        return recipes;
     }
 
     public List<Recipe> GetAllRecipes()
     {
-        var recipes = _recipeRepository.GetAllRecipes();
+        var recipes = recipeRepository.GetAllRecipes();
         return recipes;
     }
 
-    public async Task<Recipe> GetFullRecipe(int id)
+    public async Task<Recipe?> GetFullRecipe(int id)
     {
-        var recipe = await _recipeRepository.FindById(id);
-        if (recipe == null) return new Recipe();
+        var recipe = await recipeRepository.FindById(id);
+        if (recipe == null) return null;
 
         var fullRecipe = new Recipe
         {
@@ -79,19 +86,23 @@ public class RecipeService(
             ImageUrl = recipe.ImageUrl
         };
 
-        var ingredients = await _recipeRepository.GetRecipeIngredients(recipe.Id);
+        var ingredients = await recipeRepository.GetRecipeIngredients(recipe.Id);
 
         fullRecipe.Ingredients = ingredients;
 
-        var instructions = await _recipeRepository.GetRecipeInstructions(recipe.Id);
+        var instructions = await recipeRepository.GetRecipeInstructions(recipe.Id);
 
         fullRecipe.Instructions = instructions;
+
+        var recipeCreator = await userManager.Users.FirstOrDefaultAsync(user => user.Id == recipe.CreatedBy);
+        var creatorName = recipeCreator?.UserName ?? "Anonymous";
+        fullRecipe.CreatedBy = creatorName;
 
         return fullRecipe;
     }
 
     public async Task<List<Ingredient>> GetIngredientSuggestions(string nameSubstring)
     {
-        return await _ingredientRepository.FindLikeByName(nameSubstring);
+        return await ingredientRepository.FindLikeByName(nameSubstring);
     }
 }
