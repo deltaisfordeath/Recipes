@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using Recipes;
 using Recipes.DAL;
 using Recipes.Models;
+using Recipes.Repos;
 using Recipes.Services;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -38,7 +39,7 @@ app.UseRouting();
 
 app.UseAuthorization();
 
-app.MapIdentityApi<RecipeUser>();
+app.MyMapIdentityApi<RecipeUser>();
 
 app.MapControllerRoute(
     name: "default",
